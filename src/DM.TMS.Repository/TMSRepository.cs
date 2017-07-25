@@ -8,11 +8,11 @@ using System.Text;
 
 namespace DM.TMS.Repository
 {
-    public class TMSRepository<T> : BaseRepository<T>
+    public abstract class TMSRepository<T> : BaseRepository<T>
     {
         public TMSRepository()
         {
-            db = new Database(DBSettings.TMS, DatabaseType.SqlServer2012, MySqlClientFactory.Instance);
+            db = new Database(DBSettings.TMS, DatabaseType.MySQL, MySqlClientFactory.Instance);
         }
     }
 }
