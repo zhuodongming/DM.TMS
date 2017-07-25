@@ -15,4 +15,10 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0-preview2-final" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DM.TMS.App\DM.TMS.App.csproj" />
+    <ProjectReference Include="..\DM.TMS.BootStrapper\DM.TMS.BootStrapper.csproj" />
+    <ProjectReference Include="..\DM.TMS.Domain\DM.TMS.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
