@@ -1,5 +1,9 @@
-﻿using System;
+﻿using log4net;
+using log4net.Config;
+using log4net.Repository;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace DM.Infrastructure.Helper
@@ -9,14 +13,23 @@ namespace DM.Infrastructure.Helper
     /// </summary>
     public static class Log
     {
+        private readonly static ILog log = null;
+        static Log()
+        {
+            ILoggerRepository repository = LogManager.CreateRepository("NETCoreRepository");
+            XmlConfigurator.Configure(repository, new FileInfo("log4net.config"));
+            log = LogManager.GetLogger(repository.Name, "NETCorelog4net");
+        }
+
+
         /// <summary>
         /// Debug
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="e"></param>
-        public static void Debug(string msg, Exception e = null)
+        public static void Debug(object message, Exception exception = null)
         {
-
+            log.Debug(message, exception);
         }
 
         /// <summary>
@@ -24,9 +37,9 @@ namespace DM.Infrastructure.Helper
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="e"></param>
-        public static void Info(string msg, Exception e = null)
+        public static void Info(object message, Exception exception = null)
         {
-
+            log.Info(message, exception);
         }
 
         /// <summary>
@@ -34,9 +47,9 @@ namespace DM.Infrastructure.Helper
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="e"></param>
-        public static void Warn(string msg, Exception e = null)
+        public static void Warn(object message, Exception exception = null)
         {
-
+            log.Warn(message, exception);
         }
 
         /// <summary>
@@ -44,9 +57,9 @@ namespace DM.Infrastructure.Helper
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="e"></param>
-        public static void Error(string msg, Exception e = null)
+        public static void Error(object message, Exception exception = null)
         {
-
+            log.Error(message, exception);
         }
     }
 }
