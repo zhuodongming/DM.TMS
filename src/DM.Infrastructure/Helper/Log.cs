@@ -16,11 +16,10 @@ namespace DM.Infrastructure.Helper
         private readonly static ILog log = null;
         static Log()
         {
-            ILoggerRepository repository = LogManager.CreateRepository("NETCoreRepository");
+            ILoggerRepository repository = LogManager.CreateRepository("DefaultRepository");
             XmlConfigurator.Configure(repository, new FileInfo("log4net.config"));
-            log = LogManager.GetLogger(repository.Name, "NETCorelog4net");
+            log = LogManager.GetLogger(repository.Name, "DefaultLogger");
         }
-
 
         /// <summary>
         /// Debug
