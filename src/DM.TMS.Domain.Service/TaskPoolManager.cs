@@ -250,12 +250,12 @@ namespace DM.TMS.Domain.Service
                 AssemblyLoadContext assemblyContext = AssemblyLoadContext.Default;
                 assemblyContext.Resolving += ((arg1, arg2) =>
                 {
-                    string dllPath = Environment.CurrentDirectory + "\\Tasks\\" + arg2.Name + ".dll";
+                    string dllPath = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + arg2.Name + ".dll";
                     Assembly dllAssembly = assemblyContext.LoadFromAssemblyPath(dllPath);
                     return dllAssembly;
                 });
 
-                string filePath = Environment.CurrentDirectory + "\\Tasks\\" + assemblyName;
+                string filePath = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + assemblyName;
                 Assembly assembly = Assembly.LoadFrom(filePath);
                 Type type = assembly.GetType(className, true, true);
                 return type;
