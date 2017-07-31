@@ -9,7 +9,9 @@ using Quartz.Spi;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -245,10 +247,16 @@ namespace DM.TMS.Domain.Service
         {
             try
             {
-                //System.Runtime.Loader.AssemblyLoadContext
-                assemblyName = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + assemblyName + ".dll";
-                AssemblyName assemblyRef = new AssemblyName(assemblyName);
-                Assembly assembly = Assembly.Load(assemblyRef);
+                AssemblyLoadContext assemblyContext = AssemblyLoadContext.Default;
+                assemblyContext.Resolving += ((arg1, arg2) =>
+                {
+                    string dllPath = Environment.CurrentDirectory + "\\Tasks\\" + arg2.Name + ".dll";
+                    Assembly dllAssembly = assemblyContext.LoadFromAssemblyPath(dllPath);
+                    return dllAssembly;
+                });
+
+                string filePath = Environment.CurrentDirectory + "\\Tasks\\" + assemblyName;
+                Assembly assembly = Assembly.LoadFrom(filePath);
                 Type type = assembly.GetType(className, true, true);
                 return type;
             }
@@ -258,6 +266,7 @@ namespace DM.TMS.Domain.Service
                 throw;
             }
         }
+
 
         /// <summary>
         /// 获取任务在未来周期内哪些时间会运行
