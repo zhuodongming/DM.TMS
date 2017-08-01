@@ -246,12 +246,19 @@ namespace DM.TMS.Domain.Service
                 AssemblyLoadContext assemblyContext = AssemblyLoadContext.Default;
                 assemblyContext.Resolving += ((arg1, arg2) =>
                 {
-                    string dllPath = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + arg2.Name + ".dll";
-                    Assembly dllAssembly = assemblyContext.LoadFromAssemblyPath(dllPath);
-                    return dllAssembly;
+                    string dllPath = new ApplicationEnvironment().ApplicationBasePath + "Tasks\\" + arg2.Name + ".dll";
+                    if (File.Exists(dllPath))
+                    {
+                        Assembly dllAssembly = assemblyContext.LoadFromAssemblyPath(dllPath);
+                        return dllAssembly;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 });
 
-                string filePath = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + assemblyFullName;
+                string filePath = new ApplicationEnvironment().ApplicationBasePath + "Tasks\\" + assemblyFullName;
                 Assembly assembly = assemblyContext.LoadFromAssemblyPath(filePath);
                 Type type = assembly.GetType(classFullName, true, true);
                 return type;
@@ -278,7 +285,7 @@ namespace DM.TMS.Domain.Service
             }
             //时间表达式
             ITrigger trigger = TriggerBuilder.Create().WithCronSchedule(CronExpressionString).Build();
-            IList<DateTimeOffset> dates = TriggerUtils.ComputeFireTimes(trigger as IOperableTrigger, null, numTimes);
+            IReadOnlyList<DateTimeOffset> dates = TriggerUtils.ComputeFireTimes(trigger as IOperableTrigger, null, numTimes);
             List<DateTime> list = new List<DateTime>();
             foreach (DateTimeOffset dtf in dates)
             {

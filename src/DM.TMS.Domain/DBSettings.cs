@@ -6,6 +6,6 @@ namespace DM.TMS.Domain
 {
     public class DBSettings
     {
-        public static string TMS { get; set; }
+        public string TMS { get; set; }
     }
 }

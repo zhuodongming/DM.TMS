@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace DM.TMS.Domain.Service
 {
@@ -24,7 +25,7 @@ namespace DM.TMS.Domain.Service
         /// </summary>
         /// <param name="trigger">触发器</param>
         /// <param name="context">上下文</param>
-        public async Task TriggerFired(ITrigger trigger, IJobExecutionContext context)
+        public async Task TriggerFired(ITrigger trigger, IJobExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
 
         }
@@ -36,7 +37,7 @@ namespace DM.TMS.Domain.Service
         /// <param name="trigger"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<bool> VetoJobExecution(ITrigger trigger, IJobExecutionContext context)
+        public async Task<bool> VetoJobExecution(ITrigger trigger, IJobExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             //TaskHelper.UpdateRecentRunTime(trigger.JobKey.Name, TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local));
             return false;
@@ -48,7 +49,7 @@ namespace DM.TMS.Domain.Service
         /// <param name="trigger">触发器</param>
         /// <param name="context">上下文</param>
         /// <param name="triggerInstructionCode"></param>
-        public async Task TriggerComplete(ITrigger trigger, IJobExecutionContext context, SchedulerInstruction triggerInstructionCode)
+        public async Task TriggerComplete(ITrigger trigger, IJobExecutionContext context, SchedulerInstruction triggerInstructionCode, CancellationToken cancellationToken = default(CancellationToken))
         {
             //TaskHelper.UpdateLastRunTime(trigger.JobKey.Name, TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local));
         }
@@ -57,7 +58,7 @@ namespace DM.TMS.Domain.Service
         /// 错过触发时调用
         /// </summary>
         /// <param name="trigger">触发器</param>
-        public async Task TriggerMisfired(ITrigger trigger)
+        public async Task TriggerMisfired(ITrigger trigger, CancellationToken cancellationToken = default(CancellationToken))
         {
         }
     }

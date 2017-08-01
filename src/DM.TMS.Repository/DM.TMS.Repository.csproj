@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.8-dmr" />
+    <PackageReference Include="SapientGuardian.MySql.Data" Version="6.9.816" />
   </ItemGroup>
 
   <ItemGroup>
