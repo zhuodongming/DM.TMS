@@ -19,6 +19,7 @@
     <ProjectReference Include="..\DM.TMS.App\DM.TMS.App.csproj" />
     <ProjectReference Include="..\DM.TMS.BootStrapper\DM.TMS.BootStrapper.csproj" />
     <ProjectReference Include="..\DM.TMS.Domain\DM.TMS.Domain.csproj" />
+    <ProjectReference Include="..\DM.TMS.Repository\DM.TMS.Repository.csproj" />
   </ItemGroup>
 
 </Project>

@@ -35,6 +35,7 @@ namespace DM.TMS.Domain.Service
                 }
 
                 scheduler = await new StdSchedulerFactory().GetScheduler();
+                scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
 
                 Log.Info("任务调度初始化成功！");
             }
@@ -77,20 +78,15 @@ namespace DM.TMS.Domain.Service
         /// 启用任务调度
         /// 启动调度时会把任务表中状态为“执行中”的任务加入到任务调度队列中
         /// </summary>
-        public static async Task StartScheduler()
+        public static async Task StartScheduler(List<TaskModel> taskModelList)
         {
             try
             {
                 if (!scheduler.IsStarted)
                 {
-                    //添加全局监听
-                    scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());
-
                     await scheduler.Start();
 
-                    //List<TaskModel> listTask = TaskHelper.GetAllTaskList().ToList<TaskModel>();
-                    List<TaskModel> listTask = new List<TaskModel>();//获取所有执行中的任务
-                    foreach (TaskModel taskUtil in listTask)
+                    foreach (TaskModel taskUtil in taskModelList)
                     {
                         try
                         {
@@ -98,7 +94,7 @@ namespace DM.TMS.Domain.Service
                         }
                         catch (Exception e)
                         {
-                            Log.Error(string.Format("任务“{0}”启动失败！", taskUtil.TaskName), e);
+                            Log.Error($"任务“{taskUtil.TaskName}”启动失败！", e);
                         }
                     }
                     Log.Info("任务调度启动成功！");
@@ -148,7 +144,7 @@ namespace DM.TMS.Domain.Service
 
             if (CronExpression.IsValidExpression(task.CronExpressionString))//验证是否正确的Cron表达式
             {
-                IJobDetail job = new JobDetailImpl(task.TaskID, GetClassInfo(task.AssemblyFullName, task.ClassFullName));
+                IJobDetail job = new JobDetailImpl(task.TaskID, GetClassTypeInfo(task.AssemblyFullName, task.ClassFullName));
                 CronTriggerImpl trigger = new CronTriggerImpl();
                 trigger.CronExpressionString = task.CronExpressionString;
                 trigger.Name = task.TaskID;
@@ -243,7 +239,7 @@ namespace DM.TMS.Domain.Service
         /// </summary>  
         /// <param name="assemblyName">程序集</param>  
         /// <param name="className">类名</param>  
-        private static Type GetClassInfo(string assemblyName, string className)
+        private static Type GetClassTypeInfo(string assemblyFullName, string classFullName)
         {
             try
             {
@@ -255,14 +251,14 @@ namespace DM.TMS.Domain.Service
                     return dllAssembly;
                 });
 
-                string filePath = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + assemblyName;
-                Assembly assembly = Assembly.LoadFrom(filePath);
-                Type type = assembly.GetType(className, true, true);
+                string filePath = new ApplicationEnvironment().ApplicationBasePath + "\\Tasks\\" + assemblyFullName;
+                Assembly assembly = assemblyContext.LoadFromAssemblyPath(filePath);
+                Type type = assembly.GetType(classFullName, true, true);
                 return type;
             }
             catch
             {
-                Log.Error($"加载程序集类型{assemblyName}.{className}出错");
+                Log.Error($"加载程序集{assemblyFullName}类型{classFullName}出错");
                 throw;
             }
         }

@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using DM.TMS.App.TMS;
+using DM.TMS.Domain.Interface.TMS;
+using DM.TMS.Repository.TMS;
 
 namespace DM.TMS.Host
 {
@@ -14,6 +17,14 @@ namespace DM.TMS.Host
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+
+
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
+
         }
 
         public IConfiguration Configuration { get; }
@@ -21,6 +32,9 @@ namespace DM.TMS.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<TaskApp>();
+            services.AddScoped<ITaskRepository, TaskRepository>();//添加依赖注入
+
 
             services.AddMvc();
         }
@@ -46,6 +60,9 @@ namespace DM.TMS.Host
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            TaskApp taskApp = new ServiceCollection().BuildServiceProvider().GetService<TaskApp>();
+            taskApp.StartTaskHost();
         }
     }
 }
