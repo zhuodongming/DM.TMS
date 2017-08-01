@@ -148,7 +148,7 @@ namespace DM.TMS.Domain.Service
 
             if (CronExpression.IsValidExpression(task.CronExpressionString))//验证是否正确的Cron表达式
             {
-                IJobDetail job = new JobDetailImpl(task.TaskID, GetClassInfo(task.AssemblyName, task.ClassName));
+                IJobDetail job = new JobDetailImpl(task.TaskID, GetClassInfo(task.AssemblyFullName, task.ClassFullName));
                 CronTriggerImpl trigger = new CronTriggerImpl();
                 trigger.CronExpressionString = task.CronExpressionString;
                 trigger.Name = task.TaskID;
@@ -302,11 +302,9 @@ namespace DM.TMS.Domain.Service
 
             if (context != null)
             {
-
                 task.TaskID = context.Trigger.Key.Name;
                 task.TaskName = context.Trigger.Description;
-                task.RecentRunTime = DateTime.Now;
-                //task.TaskParam = context.JobDetail.JobDataMap.Get("TaskParam") != null ? context.JobDetail.JobDataMap.Get("TaskParam").ToString() : "";
+                task.LastRunTime = DateTime.Now;
             }
             return task;
         }
