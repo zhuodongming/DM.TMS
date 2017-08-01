@@ -9,73 +9,30 @@ namespace DM.TMS.Domain.TMS
     [PrimaryKey("TaskID", AutoIncrement = false)]
     public class TaskModel
     {
-        /// <summary>
-        /// 任务ID
-        /// </summary>
-        public string TaskID { get; set; }
+        public string TaskID { get; set; }//任务ID
 
-        /// <summary>
-        /// 任务名称
-        /// </summary>
-        public string TaskName { get; set; }
+        public string TaskName { get; set; }//任务名称
 
-        /// <summary>
-        /// 运行频率设置
-        /// </summary>
-        public string CronExpressionString { get; set; }
+        public string CronExpressionString { get; set; }//运行频率设置Cron表达式
 
-        /// <summary>
-        /// 任务运频率中文说明
-        /// </summary>
-        public string CronRemark { get; set; }
+        public string CronRemark { get; set; }//任务运频率中文说明
 
-        /// <summary>
-        /// 任务所在DLL对应的程序集名称
-        /// </summary>
-        public string AssemblyName { get; set; }
+        public string AssemblyFullName { get; set; }//任务所在DLL对应的程序集名称
 
-        /// <summary>
-        /// 任务所在类
-        /// </summary>
-        public string ClassName { get; set; }
+        public string ClassFullName { get; set; }//任务所在类
 
-        //public TaskStatus Status { get; set; }
+        public DateTime? LastRunTime { get; set; }//任务上一次运行时间
 
-        ///// <summary>
-        ///// 任务状态中文说明
-        ///// </summary>
-        //public string StatusCn
-        //{
-        //    get
-        //    {
-        //        return Status == TaskStatus.STOP ? "停止" : "运行";
-        //    }
-        //}
+        public DateTime? NextRunTime { get; set; }//任务下一次运行时间
 
-        /// <summary>
-        /// 任务创建时间
-        /// </summary>
-        public DateTime? CreatedOn { get; set; }
+        public int Status { get; set; }//任务状态
 
-        /// <summary>
-        /// 任务修改时间
-        /// </summary>
-        public DateTime? ModifyOn { get; set; }
+        public int IsEnabled { get; set; }//是否启用
 
-        /// <summary>
-        /// 任务最近运行时间
-        /// </summary>
-        public DateTime? RecentRunTime { get; set; }
+        public string Remark { get; set; }//备注
 
-        /// <summary>
-        /// 任务下次运行时间
-        /// </summary>
-        public DateTime? LastRunTime { get; set; }
+        public DateTime CreateTime { get; set; }//任务创建时间
 
-        /// <summary>
-        /// 任务备注
-        /// </summary>
-        public string Remark { get; set; }
-
+        public DateTime? ModifyTime { get; set; }//任务修改时间
     }
 }
