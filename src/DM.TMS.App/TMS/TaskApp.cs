@@ -20,8 +20,8 @@ namespace DM.TMS.App.TMS
         {
             string strWhere = " where IsEnabled=1 ";
             List<TaskModel> taskModelList = await taskRepository.FetchAsync(strWhere);
-            await TaskPoolManager.InitScheduler();
-            await TaskPoolManager.StartScheduler(taskModelList);
+            await TaskPoolManager.Start();
+            await TaskPoolManager.ScheduleJobs(taskModelList);
         }
     }
 }

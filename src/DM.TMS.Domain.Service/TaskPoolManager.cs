@@ -14,159 +14,185 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace DM.TMS.Domain.Service
 {
     public static class TaskPoolManager
     {
         private static IScheduler scheduler = null;
+        private static object lockObj = new object();//锁对象
 
-        /// <summary>
-        /// 初始化任务调度对象
-        /// </summary>
-        public static async Task InitScheduler()
+        static TaskPoolManager()
         {
-            try
-            {
-                if (scheduler != null)
-                {
-                    Log.Warn("任务管理器已经初始化过");
-                    return;
-                }
-
-                scheduler = await new StdSchedulerFactory().GetScheduler();
-                scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
-
-                Log.Info("任务调度初始化成功！");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("任务调度初始化失败！", ex);
-            }
+            scheduler = new StdSchedulerFactory().GetScheduler().Result;
+            scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
+            scheduler.Start().Wait();
         }
 
+        ///// <summary>
+        ///// 初始化任务调度对象
+        ///// </summary>
+        //public static void InitScheduler()
+        //{
+        //    try
+        //    {
+        //        lock (lockObj)
+        //        {
+        //            if (scheduler != null)
+        //            {
+        //                throw new Exception("任务管理器已经初始化过");
+        //            }
+
+        //            scheduler = new StdSchedulerFactory().GetScheduler().Result;
+        //            scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
+        //        }
+
+        //        Log.Info("任务调度初始化成功！");
+        //    }
+        //    catch
+        //    {
+        //        Log.Error("任务调度初始化失败！");
+        //        throw;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// 初始化 远程Quartz服务器中的，各个Scheduler实例。
+        ///// 提供给远程管理端的后台，用户获取Scheduler实例的信息。
+        ///// </summary>
+        //public static void InitRemoteScheduler(string remoteServer, int port)
+        //{
+        //    try
+        //    {
+        //        lock (lockObj)
+        //        {
+        //            if (scheduler != null)
+        //            {
+        //                throw new Exception("任务管理器已经初始化过");
+        //            }
+
+        //            NameValueCollection properties = new NameValueCollection();
+        //            properties["quartz.scheduler.instanceName"] = "ExampleQuartzScheduler";
+        //            properties["quartz.scheduler.proxy"] = "true";
+        //            properties["quartz.scheduler.proxy.address"] = $"tcp://{remoteServer}:{port}/QuartzScheduler";
+
+        //            scheduler = new StdSchedulerFactory(properties).GetScheduler().Result;
+        //            scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
+        //        }
+
+        //        Log.Info("远程任务调度初始化成功！");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error("初始化远程任务管理器失败", ex);
+        //    }
+        //}
+
+
         /// <summary>
-        /// 初始化 远程Quartz服务器中的，各个Scheduler实例。
-        /// 提供给远程管理端的后台，用户获取Scheduler实例的信息。
+        /// 启动任务调度器
         /// </summary>
-        public static async void InitRemoteScheduler(string remoteServer, int port)
-        {
-            try
-            {
-                if (scheduler != null)
-                {
-                    Log.Warn("任务管理器已经初始化过");
-                    return;
-                }
-
-                NameValueCollection properties = new NameValueCollection();
-                properties["quartz.scheduler.instanceName"] = "ExampleQuartzScheduler";
-                properties["quartz.scheduler.proxy"] = "true";
-                properties["quartz.scheduler.proxy.address"] = $"tcp://{remoteServer}:{port}/QuartzScheduler";
-
-                scheduler = await new StdSchedulerFactory(properties).GetScheduler();
-
-                Log.Info("远程任务调度初始化成功！");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("初始化远程任务管理器失败" + ex);
-            }
-        }
-
-        /// <summary>
-        /// 启用任务调度
-        /// 启动调度时会把任务表中状态为“执行中”的任务加入到任务调度队列中
-        /// </summary>
-        public static async Task StartScheduler(List<TaskModel> taskModelList)
+        public static async Task Start()
         {
             try
             {
                 if (!scheduler.IsStarted)
                 {
                     await scheduler.Start();
-
-                    foreach (TaskModel taskUtil in taskModelList)
-                    {
-                        try
-                        {
-                            await ScheduleJob(taskUtil);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error($"任务“{taskUtil.TaskName}”启动失败！", e);
-                        }
-                    }
-                    Log.Info("任务调度启动成功！");
                 }
             }
             catch
             {
-                Log.Error("任务调度启动失败！");
+                Log.Error("启动任务调度器失败！");
                 throw;
             }
+            Log.Info("启动任务调度器成功！");
         }
 
         /// <summary>
-        /// 停止任务调度
+        /// 停止任务调度器
         /// </summary>
-        public static async Task StopSchedule()
+        public static async Task Stop()
         {
             try
             {
-                //判断调度是否已经关闭
                 if (!scheduler.IsShutdown)
                 {
-                    //等待任务运行完成
-                    await scheduler.Shutdown(true);
-                    Log.Info("任务调度停止！");
+                    await scheduler.Shutdown();
                 }
             }
             catch
             {
-                Log.Error("任务调度停止失败！");
+                Log.Error("停止任务调度器失败！");
+                throw;
+            }
+            Log.Info("停止任务调度器成功！");
+        }
+
+        /// <summary>
+        /// 启用任务列表
+        /// </summary>
+        /// <param name="taskModelList">任务列表</param>
+        /// <returns></returns>
+        public static async Task ScheduleJobs(List<TaskModel> taskModelList)
+        {
+            try
+            {
+                foreach (TaskModel taskModel in taskModelList)
+                {
+                    await ScheduleJob(taskModel);
+                }
+                Log.Info("启用任务列表成功！");
+            }
+            catch
+            {
+                Log.Error("启用任务列表失败！");
                 throw;
             }
         }
 
         /// <summary>
         /// 启用任务
-        /// <param name="task">任务信息</param>
-        /// <param name="isDeleteOldTask">是否删除原有任务</param>
-        /// <returns>返回任务trigger</returns>
         /// </summary>
-        public static async Task ScheduleJob(TaskModel task, bool isDeleteOldTask = false)
+        public static async Task ScheduleJob(TaskModel taskModel)
         {
-            if (isDeleteOldTask)
+            try
             {
-                await DeleteJob(task.TaskID);//先删除现有已存在任务
-            }
-
-            if (CronExpression.IsValidExpression(task.CronExpressionString))//验证是否正确的Cron表达式
-            {
-                IJobDetail job = new JobDetailImpl(task.TaskID, GetClassTypeInfo(task.AssemblyFullName, task.ClassFullName));
-                CronTriggerImpl trigger = new CronTriggerImpl();
-                trigger.CronExpressionString = task.CronExpressionString;
-                trigger.Name = task.TaskID;
-                trigger.Description = task.TaskName;
-                await scheduler.ScheduleJob(job, trigger);
-                //if (task.Status == TaskStatus.STOP)
-                //{
-                //    JobKey jk = new JobKey(task.TaskID);
-                //    await scheduler.PauseJob(jk);
-                //}
-
-                Log.Info($"任务“{task.TaskName}”启动成功,未来5次运行时间如下:");
-                List<DateTime> list = GetNextFireTime(task.CronExpressionString, 5);
-                foreach (var time in list)
+                if (CronExpression.IsValidExpression(taskModel.CronExpressionString))//验证是否正确的Cron表达式
                 {
-                    Log.Info(time.ToString());
+                    await DeleteJob(taskModel.TaskID);//先删除现有已存在任务
+
+                    IJobDetail job = new JobDetailImpl(taskModel.TaskID, GetClassTypeInfo(taskModel.AssemblyFullName, taskModel.ClassFullName));
+                    CronTriggerImpl trigger = new CronTriggerImpl();
+                    trigger.CronExpressionString = taskModel.CronExpressionString;
+                    trigger.Name = taskModel.TaskID;
+                    trigger.Description = taskModel.TaskName;
+                    await scheduler.ScheduleJob(job, trigger);
+                    if (taskModel.Status == 0)
+                    {
+                        JobKey jk = new JobKey(taskModel.TaskID);
+                        await scheduler.PauseJob(jk);
+                    }
+
+                    Log.Info($"任务“{taskModel.TaskName}”启动成功,未来5次运行时间如下:");
+                    List<DateTime> list = GetNextFireTime(taskModel.CronExpressionString, 5);
+                    foreach (var time in list)
+                    {
+                        Log.Info(time.ToString());
+                    }
+                }
+                else
+                {
+                    throw new Exception(taskModel.CronExpressionString + "不是正确的Cron表达式,无法启动该任务!");
                 }
             }
-            else
+            catch
             {
-                throw new Exception(task.CronExpressionString + "不是正确的Cron表达式,无法启动该任务!");
+                Log.Error($"启用任务“{taskModel.TaskName}”失败");
+                throw;
             }
+            Log.Error($"启用任务“{taskModel.TaskName}”成功！");
         }
 
         /// <summary>
@@ -216,16 +242,16 @@ namespace DM.TMS.Domain.Service
         /// <summary>
         /// 恢复任务
         /// </summary>
-        /// <param name="JobKey">任务key</param>
-        public static async Task ResumeJob(string JobKey)
+        /// <param name="jobKey">任务key</param>
+        public static async Task ResumeJob(string jobKey)
         {
             try
             {
-                JobKey jk = new JobKey(JobKey);
+                JobKey jk = new JobKey(jobKey);
                 if (await scheduler.CheckExists(jk))
                 {
                     await scheduler.ResumeJob(jk);
-                    Log.Info($"任务“{JobKey}”恢复运行");
+                    Log.Info($"任务“{jobKey}”恢复运行");
                 }
             }
             catch
@@ -270,6 +296,29 @@ namespace DM.TMS.Domain.Service
             }
         }
 
+        /// <summary>
+        ///立即运行一次任务
+        /// </summary>
+        /// <param name="jobKey">任务key</param>
+        public static async Task RunOnceTask(string jobKey)
+        {
+            JobKey jk = new JobKey(jobKey);
+            if (await scheduler.CheckExists(jk))
+            {
+                var jobDetail = await scheduler.GetJobDetail(jk);
+                var triggers = await scheduler.GetTriggersOfJob(jk);
+                string taskName = jobKey;
+                if (triggers != null && triggers.Count > 0)
+                {
+                    taskName = triggers.First().Description;
+                }
+                var type = jobDetail.JobType;
+                var instance = Activator.CreateInstance(type);
+                var method = type.GetMethod("Execute");
+                method.Invoke(instance, new object[] { null });
+                Log.Info(string.Format("任务“{0}”立即运行", taskName));
+            }
+        }
 
         /// <summary>
         /// 获取任务在未来周期内哪些时间会运行
@@ -292,24 +341,6 @@ namespace DM.TMS.Domain.Service
                 list.Add(TimeZoneInfo.ConvertTime(dtf.DateTime, TimeZoneInfo.Local));
             }
             return list;
-        }
-
-        /// <summary>
-        /// 获取当前执行的Task 对象
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public static TaskModel GetTaskDetail(IJobExecutionContext context)
-        {
-            TaskModel task = new TaskModel();
-
-            if (context != null)
-            {
-                task.TaskID = context.Trigger.Key.Name;
-                task.TaskName = context.Trigger.Description;
-                task.LastRunTime = DateTime.Now;
-            }
-            return task;
         }
     }
 }
