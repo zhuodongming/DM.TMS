@@ -48,11 +48,11 @@ namespace DM.TMS.Domain.Service
         //            scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
         //        }
 
-        //        Log.Info("任务调度初始化成功！");
+        //        Log.Info("任务调度初始化成功");
         //    }
         //    catch
         //    {
-        //        Log.Error("任务调度初始化失败！");
+        //        Log.Error("任务调度初始化失败");
         //        throw;
         //    }
         //}
@@ -81,7 +81,7 @@ namespace DM.TMS.Domain.Service
         //            scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
         //        }
 
-        //        Log.Info("远程任务调度初始化成功！");
+        //        Log.Info("远程任务调度初始化成功");
         //    }
         //    catch (Exception ex)
         //    {
@@ -100,14 +100,14 @@ namespace DM.TMS.Domain.Service
                 if (!scheduler.IsStarted)
                 {
                     await scheduler.Start();
+                    Log.Info("启动任务调度器成功");
                 }
             }
             catch
             {
-                Log.Error("启动任务调度器失败！");
+                Log.Error("启动任务调度器失败");
                 throw;
             }
-            Log.Info("启动任务调度器成功！");
         }
 
         /// <summary>
@@ -120,14 +120,14 @@ namespace DM.TMS.Domain.Service
                 if (!scheduler.IsShutdown)
                 {
                     await scheduler.Shutdown();
+                    Log.Info("停止任务调度器成功");
                 }
             }
             catch
             {
-                Log.Error("停止任务调度器失败！");
+                Log.Error("停止任务调度器失败");
                 throw;
             }
-            Log.Info("停止任务调度器成功！");
         }
 
         /// <summary>
@@ -143,11 +143,11 @@ namespace DM.TMS.Domain.Service
                 {
                     await ScheduleJob(taskModel);
                 }
-                Log.Info("启用任务列表成功！");
+                Log.Info("启用任务列表成功");
             }
             catch
             {
-                Log.Error("启用任务列表失败！");
+                Log.Error("启用任务列表失败");
                 throw;
             }
         }
@@ -159,10 +159,14 @@ namespace DM.TMS.Domain.Service
         {
             try
             {
+                JobKey jobKey = new JobKey(taskModel.TaskID);
+                if (await scheduler.CheckExists(jobKey))
+                {
+                    throw new Exception($"任务{taskModel.TaskID}已经存在，不能重复启用任务");
+                }
+
                 if (CronExpression.IsValidExpression(taskModel.CronExpressionString))//验证是否正确的Cron表达式
                 {
-                    await DeleteJob(taskModel.TaskID);//先删除现有已存在任务
-
                     IJobDetail job = new JobDetailImpl(taskModel.TaskID, GetClassTypeInfo(taskModel.AssemblyFullName, taskModel.ClassFullName));
                     CronTriggerImpl trigger = new CronTriggerImpl();
                     trigger.CronExpressionString = taskModel.CronExpressionString;
@@ -181,6 +185,8 @@ namespace DM.TMS.Domain.Service
                     {
                         Log.Info(time.ToString());
                     }
+
+                    Log.Info($"启用任务“{taskModel.TaskName}”成功");
                 }
                 else
                 {
@@ -192,7 +198,6 @@ namespace DM.TMS.Domain.Service
                 Log.Error($"启用任务“{taskModel.TaskName}”失败");
                 throw;
             }
-            Log.Error($"启用任务“{taskModel.TaskName}”成功！");
         }
 
         /// <summary>
@@ -207,12 +212,16 @@ namespace DM.TMS.Domain.Service
                 if (await scheduler.CheckExists(jk))
                 {
                     await scheduler.DeleteJob(jk);
-                    Log.Info($"任务“{jobKey}”删除成功");
+                    Log.Info($"删除任务“{jobKey}”成功");
+                }
+                else
+                {
+                    throw new Exception($"任务“{jobKey}”不存在,不能删除任务");
                 }
             }
             catch
             {
-                Log.Error($"任务“{jobKey}”删除失败");
+                Log.Error($"删除任务“{jobKey}”失败");
                 throw;
             }
         }
@@ -229,12 +238,16 @@ namespace DM.TMS.Domain.Service
                 if (await scheduler.CheckExists(jk))
                 {
                     await scheduler.PauseJob(jk);
-                    Log.Info($"任务“{jobKey}”已经暂停");
+                    Log.Info($"暂停任务“{jobKey}”成功");
+                }
+                else
+                {
+                    throw new Exception($"任务“{jobKey}”不存在,不能暂停任务");
                 }
             }
             catch
             {
-                Log.Error($"暂停任务“{jobKey}”失败!");
+                Log.Error($"暂停任务“{jobKey}”失败");
                 throw;
             }
         }
@@ -251,12 +264,16 @@ namespace DM.TMS.Domain.Service
                 if (await scheduler.CheckExists(jk))
                 {
                     await scheduler.ResumeJob(jk);
-                    Log.Info($"任务“{jobKey}”恢复运行");
+                    Log.Info($"恢复任务“{jobKey}”成功");
+                }
+                else
+                {
+                    throw new Exception($"任务“{jobKey}”不存在,不能恢复任务");
                 }
             }
             catch
             {
-                Log.Error("恢复任务失败!");
+                Log.Error("恢复任务失败");
                 throw;
             }
         }
@@ -297,7 +314,7 @@ namespace DM.TMS.Domain.Service
         }
 
         /// <summary>
-        ///立即运行一次任务
+        /// 立即运行一次任务
         /// </summary>
         /// <param name="jobKey">任务key</param>
         public static async Task RunOnceTask(string jobKey)
@@ -317,6 +334,10 @@ namespace DM.TMS.Domain.Service
                 var method = type.GetMethod("Execute");
                 method.Invoke(instance, new object[] { null });
                 Log.Info(string.Format("任务“{0}”立即运行", taskName));
+            }
+            else
+            {
+                throw new Exception($"任务{jobKey}不存在,不能立即运行一次任务");
             }
         }
 
