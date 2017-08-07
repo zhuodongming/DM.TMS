@@ -1,4 +1,4 @@
-/*
+﻿/*
 Navicat MySQL Data Transfer
 
 Source Server         : 01开发MySQL
@@ -16,9 +16,9 @@ Date: 2017-08-01 14:14:45
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for task
+-- Table structure for Task
 -- ----------------------------
-DROP TABLE IF EXISTS `task`;
+DROP TABLE IF EXISTS `Task`;
 CREATE TABLE `task` (
   `TaskID` varchar(50) NOT NULL COMMENT '任务ID',
   `TaskName` varchar(100) NOT NULL COMMENT '任务名称',
@@ -39,4 +39,4 @@ CREATE TABLE `task` (
 -- ----------------------------
 -- Records of task
 -- ----------------------------
-INSERT INTO `task` VALUES ('Test2017', '测试任务,输出当前时间', '0/10 * * * * ?', '每10秒运行一次', 'DM.Task', 'DM.Task.TaskSet.TestJob', null, null, '0', '1', ' ', '2017-07-25 00:00:00', null);
+INSERT INTO `Task` VALUES ('Test2017', '测试任务,输出当前时间', '0/10 * * * * ?', '每10秒运行一次', 'DM.Task', 'DM.Task.TaskSet.TestJob', null, null, '0', '1', ' ', '2017-07-25 00:00:00', null);
