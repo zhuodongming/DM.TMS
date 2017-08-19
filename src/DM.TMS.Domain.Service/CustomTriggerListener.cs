@@ -25,9 +25,9 @@ namespace DM.TMS.Domain.Service
         /// </summary>
         /// <param name="trigger">触发器</param>
         /// <param name="context">上下文</param>
-        public async Task TriggerFired(ITrigger trigger, IJobExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public Task TriggerFired(ITrigger trigger, IJobExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
-
+            return Task.CompletedTask;
         }
 
 
@@ -37,10 +37,10 @@ namespace DM.TMS.Domain.Service
         /// <param name="trigger"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<bool> VetoJobExecution(ITrigger trigger, IJobExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> VetoJobExecution(ITrigger trigger, IJobExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             //TaskHelper.UpdateRecentRunTime(trigger.JobKey.Name, TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local));
-            return false;
+            return Task.FromResult(false);
         }
 
         /// <summary>
@@ -49,17 +49,19 @@ namespace DM.TMS.Domain.Service
         /// <param name="trigger">触发器</param>
         /// <param name="context">上下文</param>
         /// <param name="triggerInstructionCode"></param>
-        public async Task TriggerComplete(ITrigger trigger, IJobExecutionContext context, SchedulerInstruction triggerInstructionCode, CancellationToken cancellationToken = default(CancellationToken))
+        public Task TriggerComplete(ITrigger trigger, IJobExecutionContext context, SchedulerInstruction triggerInstructionCode, CancellationToken cancellationToken = default(CancellationToken))
         {
             //TaskHelper.UpdateLastRunTime(trigger.JobKey.Name, TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local));
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// 错过触发时调用
         /// </summary>
         /// <param name="trigger">触发器</param>
-        public async Task TriggerMisfired(ITrigger trigger, CancellationToken cancellationToken = default(CancellationToken))
+        public Task TriggerMisfired(ITrigger trigger, CancellationToken cancellationToken = default(CancellationToken))
         {
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using DM.Infrastructure.Helper;
 using DM.TMS.Domain.TMS;
-using Microsoft.Extensions.PlatformAbstractions;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
@@ -15,6 +14,7 @@ using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using DM.Infrastructure;
 
 namespace DM.TMS.Domain.Service
 {
@@ -286,23 +286,10 @@ namespace DM.TMS.Domain.Service
         {
             try
             {
-                AssemblyLoadContext assemblyContext = AssemblyLoadContext.Default;
-                assemblyContext.Resolving += ((arg1, arg2) =>
-                {
-                    string dllPath = new ApplicationEnvironment().ApplicationBasePath + "Tasks\\" + arg2.Name + ".dll";
-                    if (File.Exists(dllPath))
-                    {
-                        Assembly dllAssembly = assemblyContext.LoadFromAssemblyPath(dllPath);
-                        return dllAssembly;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                });
-
-                string filePath = new ApplicationEnvironment().ApplicationBasePath + "Tasks\\" + assemblyFullName;
-                Assembly assembly = assemblyContext.LoadFromAssemblyPath(filePath);
+                string folderPath = AppContext.BaseDirectory + Path.DirectorySeparatorChar + "Tasks";
+                string filePath = folderPath + Path.DirectorySeparatorChar + assemblyFullName;
+                AssemblyLoader asl = new AssemblyLoader(folderPath);
+                Assembly assembly = asl.LoadFromAssemblyPath(filePath);
                 Type type = assembly.GetType(classFullName, true, true);
                 return type;
             }
