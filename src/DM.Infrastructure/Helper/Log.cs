@@ -17,7 +17,7 @@ namespace DM.Infrastructure.Helper
         static Log()
         {
             ILoggerRepository repository = LogManager.CreateRepository("DefaultRepository");
-            XmlConfigurator.ConfigureAndWatch(repository, new FileInfo("log4net.config"));
+            XmlConfigurator.ConfigureAndWatch(repository, new FileInfo(AppContext.BaseDirectory + Path.DirectorySeparatorChar + "log4net.config"));
             log = LogManager.GetLogger(repository.Name, "DefaultLogger");
         }
 

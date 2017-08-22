@@ -15,7 +15,7 @@ namespace DM.TMS.Domain.Service.PKC
     {
         public static R SendNoSignRequest<T, R>(string url, T requestModel) where T : RequestModel where R : ResponseModel
         {
-            return Http.PostAsync<R>(url, Json.ToJson(requestModel)).Result;
+            return Http.PostStringAsync<R>(url, Json.ToJson(requestModel)).Result;
         }
 
         /// <summary>
@@ -35,10 +35,8 @@ namespace DM.TMS.Domain.Service.PKC
             requestModel.Sign = sign;//设置sign字段
 
             //sortedParams.Add("sign", sign);//添加sign字段
-            //sortedParams = EncodingParamValue(sortedParams);//编码参数值UrlEncode
-            //string formData = CreateLinkString(sortedParams);//拼接post报文体
 
-            return Http.PostAsync<R>(url, Json.ToJson(requestModel)).Result;
+            return Http.PostStringAsync<R>(url, Json.ToJson(requestModel)).Result;
         }
 
         /// <summary>
