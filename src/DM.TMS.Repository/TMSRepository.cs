@@ -10,9 +10,9 @@ namespace DM.TMS.Repository
 {
     public abstract class TMSRepository<T> : BaseRepository<T>
     {
-        public TMSRepository(IOptions<DBSettings> dbSettings)
+        public TMSRepository(IOptions<ConnectionStrings> connStrings)
         {
-            db = new Database(dbSettings.Value.TMS, DatabaseType.MySQL, MySqlClientFactory.Instance);
+            db = new Database(connStrings.Value.TMS, DatabaseType.MySQL, MySqlClientFactory.Instance);
         }
     }
 }

@@ -18,30 +18,20 @@ namespace DM.TMS.Host
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-
-            //var builder = new ConfigurationBuilder()
-            //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            //    .AddEnvironmentVariables();
-
-
         }
 
         public IConfiguration Configuration { get; }
 
-        public static IServiceCollection Services { get; private set; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<TaskApp, TaskApp>();
+            services.AddSingleton<TaskApp, TaskApp>();
             services.AddScoped<ITaskRepository, TaskRepository>();//添加依赖注入
 
-            services.Configure<DBSettings>(Configuration);
+            services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));//注入连接字符串
 
             services.AddMvc();
 
-            Services = services;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,7 +56,9 @@ namespace DM.TMS.Host
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            TaskApp taskApp = Services.BuildServiceProvider().GetService<TaskApp>();
+
+            //任务系统初始化
+            TaskApp taskApp = app.ApplicationServices.GetService<TaskApp>();
             taskApp.StartTaskHost().Wait();
         }
     }

@@ -10,7 +10,7 @@ namespace DM.TMS.Repository.TMS
 {
     public class TaskRepository : TMSRepository<TaskModel>, ITaskRepository
     {
-        public TaskRepository(IOptions<DBSettings> dbSettings) : base(dbSettings)
+        public TaskRepository(IOptions<ConnectionStrings> connStrings) : base(connStrings)
         {
         }
     }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DM.TMS.Domain
 {
-    public class DBSettings
+    public class ConnectionStrings
     {
         public string TMS { get; set; }
     }
