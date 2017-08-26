@@ -24,19 +24,17 @@ namespace DM.Infrastructure
 
         protected override Assembly Load(AssemblyName assemblyName)
         {
+            var library = DependencyContext.Default.CompileLibraries.Where(d => d.Name.Equals(assemblyName.Name)).FirstOrDefault();//检查依赖上下文中是否有该程序集
+            if (library != null)
+            {
+                return Assembly.Load(new AssemblyName(library.Name));
+            }
+
             var apiApplicationFileInfo = new FileInfo($"{folderPath}{Path.DirectorySeparatorChar}{assemblyName.Name}.dll");//检查运行目录下是否有该程序集
             if (File.Exists(apiApplicationFileInfo.FullName))
             {
                 var asl = new AssemblyLoader(apiApplicationFileInfo.DirectoryName);
                 return asl.LoadFromAssemblyPath(apiApplicationFileInfo.FullName);
-            }
-            else
-            {
-                var library = DependencyContext.Default.CompileLibraries.Where(d => d.Name.Equals(assemblyName.Name)).FirstOrDefault();//检查依赖上下文中是否有该程序集
-                if (library != null)
-                {
-                    return Assembly.Load(new AssemblyName(library.Name));
-                }
             }
 
             return Assembly.Load(assemblyName);

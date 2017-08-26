@@ -1,11 +1,13 @@
 ﻿using DM.Infrastructure.Helper;
 using Quartz;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace DM.TMS.Job.OutputTime
+namespace DM.TMS.Job.OutputTest
 {
-    public class OutputTimeJob : IJob
+    public class OutputTestJob : IJob
     {
         public async Task Execute(IJobExecutionContext context)
         {

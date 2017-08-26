@@ -21,6 +21,7 @@ namespace DM.TMS.Web
         }
 
         public IConfiguration Configuration { get; }
+        public IServiceCollection Services { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -31,6 +32,9 @@ namespace DM.TMS.Web
             services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));//注入连接字符串
 
             services.AddMvc();
+
+
+            Services = services;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,7 +60,7 @@ namespace DM.TMS.Web
             });
 
             //任务系统初始化
-            TaskApp taskApp = app.ApplicationServices.GetService<TaskApp>();
+            TaskApp taskApp = Services.BuildServiceProvider().GetService<TaskApp>();
             taskApp.StartTaskHost();
         }
     }
