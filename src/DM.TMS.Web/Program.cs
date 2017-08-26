@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using DM.Infrastructure.Helper;
 
 namespace DM.TMS.Web
 {
@@ -14,6 +15,8 @@ namespace DM.TMS.Web
     {
         public static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
+
             BuildWebHost(args).Run();
         }
 
@@ -21,5 +24,12 @@ namespace DM.TMS.Web
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
+
+
+
+        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Error($"未处理的异常,Source:{sender},Exception:{e.ExceptionObject}");
+        }
     }
 }
