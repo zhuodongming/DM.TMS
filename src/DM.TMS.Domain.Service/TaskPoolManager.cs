@@ -286,8 +286,8 @@ namespace DM.TMS.Domain.Service
         {
             try
             {
-                string folderPath = AppContext.BaseDirectory + Path.DirectorySeparatorChar + "Tasks";
-                string filePath = folderPath + Path.DirectorySeparatorChar + assemblyFullName;
+                string folderPath = AppContext.BaseDirectory + "Tasks" + Path.DirectorySeparatorChar;
+                string filePath = folderPath + assemblyFullName;
                 AssemblyLoader asl = new AssemblyLoader(folderPath);
                 Assembly assembly = asl.LoadFromAssemblyPath(filePath);
                 Type type = assembly.GetType(classFullName, true, true);

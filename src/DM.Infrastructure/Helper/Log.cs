@@ -18,7 +18,7 @@ namespace DM.Infrastructure.Helper
         {
             GlobalContext.Properties["BaseDirectory"] = AppContext.BaseDirectory;//设置全局属性
             ILoggerRepository repository = LogManager.CreateRepository("DefaultRepository");
-            FileInfo fileInfo = new FileInfo(AppContext.BaseDirectory + Path.DirectorySeparatorChar + "log4net.config");//读取配置文件
+            FileInfo fileInfo = new FileInfo(AppContext.BaseDirectory + "log4net.config");//读取配置文件
             XmlConfigurator.ConfigureAndWatch(repository, fileInfo);
             log = LogManager.GetLogger(repository.Name, "DefaultLogger");
         }

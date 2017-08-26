@@ -16,7 +16,7 @@ namespace DM.TMS.App.TMS
             this.taskRepository = taskRepository;
         }
 
-        public async Task StartTaskHost()
+        public async void StartTaskHost()
         {
             string strWhere = " where IsEnabled=1 ";
             List<TaskModel> taskModelList = await taskRepository.FetchAsync(strWhere);
