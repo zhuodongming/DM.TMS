@@ -1,6 +1,9 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +41,9 @@ namespace DM.Infrastructure.DI
                 throw new ArgumentNullException(nameof(services));
             }
 
+            //替换控制器所有者
+            services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
+
             ContainerBuilder builder = new ContainerBuilder();
             builder.Populate(services);
 
@@ -50,20 +56,10 @@ namespace DM.Infrastructure.DI
                     types.AddRange(item.GetTypes())
             );
 
-            //找到所有外部IDependencyRegistrar实现，调用注册
-            var registrarType = typeof(IDependencyRegistrar);
-            var arrRegistrarType = types.Where(t => registrarType.IsAssignableFrom(t) && t != registrarType).ToArray();
-            var listRegistrarInstances = new List<IDependencyRegistrar>();
-            foreach (var drType in arrRegistrarType)
-            {
-                listRegistrarInstances.Add((IDependencyRegistrar)Activator.CreateInstance(drType));
-            }
-            //排序
-            listRegistrarInstances = listRegistrarInstances.OrderBy(t => t.Order).ToList();
-            foreach (var dependencyRegistrar in listRegistrarInstances)
-            {
-                dependencyRegistrar.Register(builder, types);
-            }
+            //注册Controller,实现属性注入
+            var IControllerType = typeof(ControllerBase);
+            var arrControllerType = types.Where(t => IControllerType.IsAssignableFrom(t) && t != IControllerType).ToArray();
+            builder.RegisterTypes(arrControllerType).PropertiesAutowired();
 
             //注册TransientDependencyAttribute
             var transientTypes = types.Where(t => t.GetCustomAttribute<TransientDependencyAttribute>() != null);
