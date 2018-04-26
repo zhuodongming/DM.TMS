@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPoco" Version="3.7.1" />
+    <PackageReference Include="NPoco" Version="3.9.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DM.Infrastructure\DM.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

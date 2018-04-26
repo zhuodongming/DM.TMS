@@ -1,7 +1,8 @@
-﻿using DM.Infrastructure.Helper;
-using DM.TMS.Domain.Interface.TMS;
+﻿using DM.Infrastructure.DI;
+using DM.Infrastructure.Helper;
 using DM.TMS.Domain.Service;
 using DM.TMS.Domain.TMS;
+using DM.TMS.Repository;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,20 +10,17 @@ using System.Threading.Tasks;
 
 namespace DM.TMS.App.TMS
 {
+    [SingletonDependency]
     public class TaskApp
     {
-        private ITaskRepository taskRepository;
-        public TaskApp(ITaskRepository taskRepository)
-        {
-            this.taskRepository = taskRepository;
-        }
+        public TMSRepository<TaskModel> TaskRep { get; set; }
 
         public async void StartTaskHost()
         {
             try
             {
                 string strWhere = " where IsEnabled=1 ";
-                List<TaskModel> taskModelList = await taskRepository.FetchAsync(strWhere);
+                List<TaskModel> taskModelList = await TaskRep.FetchAsync(strWhere);
                 await TaskPoolManager.Start();
                 await TaskPoolManager.ScheduleJobs(taskModelList);
             }

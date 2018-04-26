@@ -9,7 +9,7 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// 加解密 Helper
     /// </summary>
-    public static class Crypto
+    public sealed class Crypto
     {
         /// <summary>
         /// 获取md5签名
@@ -27,6 +27,20 @@ namespace DM.Infrastructure.Helper
             using (MD5 md5 = MD5.Create())
             {
                 byte[] bytes_out = md5.ComputeHash(bytes_in);
+                return BitConverter.ToString(bytes_out).Replace("-", "").ToLower();
+            }
+        }
+
+        /// <summary>
+        /// 获取md5签名
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static string GetMD5(byte[] content)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] bytes_out = md5.ComputeHash(content);
                 return BitConverter.ToString(bytes_out).Replace("-", "").ToLower();
             }
         }
@@ -69,6 +83,21 @@ namespace DM.Infrastructure.Helper
         }
 
         /// <summary>
+        /// 获取HMACSHA1签名
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static string GetHMACSHA1(string content, string key)
+        {
+            byte[] bytes_in = Encoding.UTF8.GetBytes(content);
+            using (HMACSHA1 hmacsha1 = new HMACSHA1(Encoding.UTF8.GetBytes(key)))
+            {
+                byte[] bytes_out = hmacsha1.ComputeHash(bytes_in);
+                return Convert.ToBase64String(bytes_out);
+            }
+        }
+
+        /// <summary>
         /// 获取sha256签名
         /// </summary>
         /// <param name="content"></param>
@@ -84,7 +113,7 @@ namespace DM.Infrastructure.Helper
             using (SHA256 sha256 = SHA256.Create())
             {
                 byte[] bytes_out = sha256.ComputeHash(bytes_in);
-                return BitConverter.ToString(bytes_out).Replace("-", "").ToLower();
+                return Convert.ToBase64String(bytes_out);
             }
         }
 
@@ -104,7 +133,7 @@ namespace DM.Infrastructure.Helper
             using (SHA512 sha512 = SHA512.Create())
             {
                 byte[] bytes_out = sha512.ComputeHash(bytes_in);
-                return BitConverter.ToString(bytes_out).Replace("-", "").ToLower();
+                return Convert.ToBase64String(bytes_out);
             }
         }
     }

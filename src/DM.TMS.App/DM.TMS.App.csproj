@@ -5,9 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DM.TMS.Domain.Interface\DM.TMS.Domain.Interface.csproj" />
     <ProjectReference Include="..\DM.TMS.Domain.Service\DM.TMS.Domain.Service.csproj" />
-    <ProjectReference Include="..\DM.TMS.Domain\DM.TMS.Domain.csproj" />
+    <ProjectReference Include="..\DM.TMS.Repository\DM.TMS.Repository.csproj" />
   </ItemGroup>
 
 </Project>

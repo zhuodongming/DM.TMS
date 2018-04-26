@@ -8,8 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DM.TMS.App.TMS;
 using DM.TMS.Domain;
-using DM.TMS.Repository.TMS;
-using DM.TMS.Domain.Interface.TMS;
+using DM.Infrastructure.DI;
 
 namespace DM.TMS.Web
 {
@@ -21,20 +20,14 @@ namespace DM.TMS.Web
         }
 
         public IConfiguration Configuration { get; }
-        public IServiceCollection Services { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<TaskApp, TaskApp>();
-            services.AddScoped<ITaskRepository, TaskRepository>();//添加依赖注入
-
+            services.AddMvc();
             services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));//注入连接字符串
 
-            services.AddMvc();
-
-
-            Services = services;
+            return IocManager.Initialize(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,8 +53,7 @@ namespace DM.TMS.Web
             });
 
             //任务系统初始化
-            TaskApp taskApp = Services.BuildServiceProvider().GetService<TaskApp>();
-            taskApp.StartTaskHost();
+            IocManager.Resolve<TaskApp>().StartTaskHost();
         }
     }
 }

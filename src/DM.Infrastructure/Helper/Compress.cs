@@ -9,7 +9,7 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// 压缩解压 Helper
     /// </summary>
-    public static class Compress
+    public sealed class Compress
     {
         /// <summary>
         /// GZip压缩
@@ -31,7 +31,7 @@ namespace DM.Infrastructure.Helper
             }
             catch
             {
-                //LogHelper.Error("GZip压缩出错");
+                Log.Error("GZip压缩出错");
                 throw;
             }
         }
@@ -56,7 +56,7 @@ namespace DM.Infrastructure.Helper
             }
             catch
             {
-                //LogHelper.Error("GZip解压缩出错");
+                Log.Error("GZip解压缩出错");
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace DM.Infrastructure.Helper
             }
             catch
             {
-                //LogHelper.Error("Zip压缩出错");
+                Log.Error("Zip压缩出错");
                 throw;
             }
         }
@@ -115,7 +115,7 @@ namespace DM.Infrastructure.Helper
             }
             catch (Exception e)
             {
-                //LogHelper.Error("Zip解压缩出错");
+                Log.Error("Zip解压缩出错");
                 throw e;
             }
         }

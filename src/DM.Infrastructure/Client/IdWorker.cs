@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DM.Infrastructure.Helper
+namespace DM.Infrastructure.Client
 {
     /// <summary>
     /// 雪花Id生成器

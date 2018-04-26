@@ -9,8 +9,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DM.TMS.Domain.Interface\DM.TMS.Domain.Interface.csproj" />
-    <ProjectReference Include="..\DM.TMS.Domain\DM.TMS.Domain.csproj" />
+    <Folder Include="TMS\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DM.TMS.Domain\DM.TMS.Domain.Entity.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// 正则 Helper
     /// </summary>
-    public static class RegexEx
+    public sealed class RegexEx
     {
         /// <summary>
         /// 是否手机号码

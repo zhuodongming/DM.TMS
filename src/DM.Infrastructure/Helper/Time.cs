@@ -7,7 +7,7 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// Time Helper
     /// </summary>
-    public static class Time
+    public sealed class Time
     {
         private static readonly DateTime Jan1st1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -46,7 +46,7 @@ namespace DM.Infrastructure.Helper
         /// <returns></returns>
         public static long ToTimestampByMS(DateTime time)
         {
-            return (int)(time.ToUniversalTime() - Jan1st1970).TotalMilliseconds;
+            return (long)(time.ToUniversalTime() - Jan1st1970).TotalMilliseconds;
         }
 
         /// <summary>

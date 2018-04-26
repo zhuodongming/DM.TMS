@@ -8,7 +8,7 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// Json Helper
     /// </summary>
-    public static class Json
+    public sealed class Json
     {
         /// <summary>
         /// 转换为json字符串
@@ -28,7 +28,15 @@ namespace DM.Infrastructure.Helper
         /// <returns>T</returns>
         public static T ToObject<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            catch
+            {
+                Log.Error($"解析Json出错:{json}");
+                throw;
+            }
         }
     }
 }

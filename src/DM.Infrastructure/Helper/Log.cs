@@ -11,7 +11,7 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// Log Helper
     /// </summary>
-    public static class Log
+    public sealed class Log
     {
         private static ILog log = null;
         static Log()

@@ -1,5 +1,4 @@
-﻿using DM.TMS.Domain.Interface;
-using NPoco;
+﻿using NPoco;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DM.TMS.Repository
 {
-    public abstract class BaseRepository<T> : IRepository<T>
+    public abstract class BaseRepository<T>
     {
         protected Database db = null;
 
@@ -23,6 +22,23 @@ namespace DM.TMS.Repository
         {
             return db.InsertAsync(tableName, primaryKeyName, poco);
         }
+
+        public Task InsertBatchAsync(IEnumerable<T> pocos)
+        {
+            return Task.Run(() =>
+            {
+                db.InsertBatch(pocos, new BatchOptions() { BatchSize = 100 });
+            });
+        }
+
+        public Task InsertBulkAsync(IEnumerable<T> pocos)
+        {
+            return Task.Run(() =>
+            {
+                db.InsertBulk(pocos);
+            });
+        }
+
         #endregion
 
         #region 删

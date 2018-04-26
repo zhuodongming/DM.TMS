@@ -14,19 +14,21 @@ namespace DM.Infrastructure.Helper
     /// <summary>
     /// Http Helper
     /// </summary>
-    public sealed class Http
+    public sealed class TwoWayHttp
     {
         private static readonly HttpClient httpClient = null;
-        static Http()
+        static TwoWayHttp()
         {
             HttpClientHandler hander = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,//启用响应内容压缩
                 ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation,//设置访问https url
             };
+            X509Certificate2 cert = new X509Certificate2(@"outgoing.CertwithKey.pkcs12", "IoM@1234");
+            hander.ClientCertificates.Add(cert);
 
             httpClient = new HttpClient(hander);
-            //httpClient.Timeout = TimeSpan.FromSeconds(10);//超时设置
+            httpClient.Timeout = TimeSpan.FromSeconds(10);//超时设置
             //httpClient.DefaultRequestHeaders.Connection.Add("keep-alive");//保持链接
         }
 
@@ -49,7 +51,7 @@ namespace DM.Infrastructure.Helper
             }
         }
 
-        public async static Task<byte[]> GetBytesAsync(string url, IDictionary<string, string> headers = null)
+        public async static Task<Stream> GetStreamAsync(string url, IDictionary<string, string> headers = null)
         {
             using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url))
             {
@@ -61,7 +63,7 @@ namespace DM.Infrastructure.Helper
 
                 using (HttpResponseMessage response = await httpClient.SendAsync(request))
                 {
-                    return await response.Content.ReadAsByteArrayAsync();
+                    return await response.Content.ReadAsStreamAsync();
                 }
             }
         }
