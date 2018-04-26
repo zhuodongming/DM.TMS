@@ -1,5 +1,5 @@
 ﻿using DM.Infrastructure.DI;
-using DM.TMS.Domain;
+using DM.TMS.Domain.Entity;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using NPoco;

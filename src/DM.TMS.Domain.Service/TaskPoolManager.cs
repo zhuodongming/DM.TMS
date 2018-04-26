@@ -1,5 +1,4 @@
 ﻿using DM.Infrastructure.Helper;
-using DM.TMS.Domain.TMS;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
@@ -15,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using DM.Infrastructure;
+using DM.TMS.Domain.Entity.TMS;
 
 namespace DM.TMS.Domain.Service
 {

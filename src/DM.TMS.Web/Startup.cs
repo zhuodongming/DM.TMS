@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DM.TMS.App.TMS;
-using DM.TMS.Domain;
 using DM.Infrastructure.DI;
+using DM.TMS.Domain.Entity;
 
 namespace DM.TMS.Web
 {

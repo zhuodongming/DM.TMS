@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DM.TMS.Domain
+namespace DM.TMS.Domain.Entity
 {
     public class ConnectionStrings
     {

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DM.TMS.Domain.TMS
+namespace DM.TMS.Domain.Entity.TMS
 {
     [TableName("Task")]
     [PrimaryKey("TaskID", AutoIncrement = false)]
