@@ -173,7 +173,7 @@ namespace DM.TMS.Domain.Service
                     trigger.Name = taskModel.TaskID;
                     trigger.Description = taskModel.TaskName;
                     await scheduler.ScheduleJob(job, trigger);
-                    if (taskModel.Status == 0)
+                    if (taskModel.IsEnabled == 0)
                     {
                         JobKey jk = new JobKey(taskModel.TaskID);
                         await scheduler.PauseJob(jk);
@@ -281,7 +281,7 @@ namespace DM.TMS.Domain.Service
         /// 获取类的属性、方法  
         /// </summary>  
         /// <param name="assemblyName">程序集</param>  
-        /// <param name="className">类名</param>  
+        /// <param name="className">类名</param>
         private static Type GetClassTypeInfo(string assemblyFullName, string classFullName)
         {
             try

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,20 +23,13 @@ namespace DM.Infrastructure
 
         protected override Assembly Load(AssemblyName assemblyName)
         {
-            var library = DependencyContext.Default.CompileLibraries.Where(d => d.Name.Equals(assemblyName.Name)).FirstOrDefault();//检查依赖上下文中是否有该程序集
-            if (library != null)
+            string filePath = $"{folderPath}{Path.DirectorySeparatorChar}{assemblyName.Name}.dll";//检查运行目录下是否有该程序集
+            if (File.Exists(filePath))
             {
-                return Assembly.Load(new AssemblyName(library.Name));
+                return AssemblyLoadContext.Default.LoadFromAssemblyPath(filePath);
             }
 
-            var apiApplicationFileInfo = new FileInfo($"{folderPath}{Path.DirectorySeparatorChar}{assemblyName.Name}.dll");//检查运行目录下是否有该程序集
-            if (File.Exists(apiApplicationFileInfo.FullName))
-            {
-                var asl = new AssemblyLoader(apiApplicationFileInfo.DirectoryName);
-                return asl.LoadFromAssemblyPath(apiApplicationFileInfo.FullName);
-            }
-
-            return Assembly.Load(assemblyName);
+            return AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
         }
     }
 }

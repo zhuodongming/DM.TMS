@@ -26,7 +26,7 @@ namespace DM.Infrastructure.DI
             if (amb == null)
             {
                 assemblies.Add(assembly);
-                var ambNames = assembly.GetReferencedAssemblies().Where(a => a.FullName.StartsWith("PKC"));
+                var ambNames = assembly.GetReferencedAssemblies().Where(a => a.FullName.StartsWith("DM"));
                 foreach (var ambName in ambNames)
                 {
                     AddAmb(Assembly.Load(ambName));
