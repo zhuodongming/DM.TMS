@@ -21,7 +21,6 @@ namespace DM.TMS.App.TMS
             {
                 string strWhere = " where IsEnabled=1 ";
                 List<TaskModel> taskModelList = await TaskRep.FetchAsync(strWhere);
-                await TaskPoolManager.Start();
                 await TaskPoolManager.ScheduleJobs(taskModelList);
             }
             catch (Exception ex)

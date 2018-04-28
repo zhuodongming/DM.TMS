@@ -31,33 +31,6 @@ namespace DM.TMS.Domain.Service
         }
 
         ///// <summary>
-        ///// 初始化任务调度对象
-        ///// </summary>
-        //public static void InitScheduler()
-        //{
-        //    try
-        //    {
-        //        lock (lockObj)
-        //        {
-        //            if (scheduler != null)
-        //            {
-        //                throw new Exception("任务管理器已经初始化过");
-        //            }
-
-        //            scheduler = new StdSchedulerFactory().GetScheduler().Result;
-        //            scheduler.ListenerManager.AddTriggerListener(new CustomTriggerListener(), GroupMatcher<TriggerKey>.AnyGroup());//添加全局监听
-        //        }
-
-        //        Log.Info("任务调度初始化成功");
-        //    }
-        //    catch
-        //    {
-        //        Log.Error("任务调度初始化失败");
-        //        throw;
-        //    }
-        //}
-
-        ///// <summary>
         ///// 初始化 远程Quartz服务器中的，各个Scheduler实例。
         ///// 提供给远程管理端的后台，用户获取Scheduler实例的信息。
         ///// </summary>
@@ -88,47 +61,6 @@ namespace DM.TMS.Domain.Service
         //        Log.Error("初始化远程任务管理器失败", ex);
         //    }
         //}
-
-
-        /// <summary>
-        /// 启动任务调度器
-        /// </summary>
-        public static async Task Start()
-        {
-            try
-            {
-                if (!scheduler.IsStarted)
-                {
-                    await scheduler.Start();
-                    Log.Info("启动任务调度器成功");
-                }
-            }
-            catch
-            {
-                Log.Error("启动任务调度器失败");
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 停止任务调度器
-        /// </summary>
-        public static async Task Stop()
-        {
-            try
-            {
-                if (!scheduler.IsShutdown)
-                {
-                    await scheduler.Shutdown();
-                    Log.Info("停止任务调度器成功");
-                }
-            }
-            catch
-            {
-                Log.Error("停止任务调度器失败");
-                throw;
-            }
-        }
 
         /// <summary>
         /// 启用任务列表
@@ -179,13 +111,6 @@ namespace DM.TMS.Domain.Service
                         await scheduler.PauseJob(jk);
                     }
 
-                    Log.Info($"任务“{taskModel.TaskName}”启动成功,未来5次运行时间如下:");
-                    List<DateTime> list = GetNextFireTime(taskModel.CronExpressionString, 5);
-                    foreach (var time in list)
-                    {
-                        Log.Info(time.ToString());
-                    }
-
                     Log.Info($"启用任务“{taskModel.TaskName}”成功");
                 }
                 else
@@ -213,10 +138,6 @@ namespace DM.TMS.Domain.Service
                 {
                     await scheduler.DeleteJob(jk);
                     Log.Info($"删除任务“{jobKey}”成功");
-                }
-                else
-                {
-                    throw new Exception($"任务“{jobKey}”不存在,不能删除任务");
                 }
             }
             catch
@@ -326,29 +247,6 @@ namespace DM.TMS.Domain.Service
             {
                 throw new Exception($"任务{jobKey}不存在,不能立即运行一次任务");
             }
-        }
-
-        /// <summary>
-        /// 获取任务在未来周期内哪些时间会运行
-        /// </summary>
-        /// <param name="CronExpressionString">Cron表达式</param>
-        /// <param name="numTimes">运行次数</param>
-        /// <returns>运行时间段</returns>
-        public static List<DateTime> GetNextFireTime(string CronExpressionString, int numTimes)
-        {
-            if (numTimes < 0)
-            {
-                throw new Exception("参数numTimes值大于等于0");
-            }
-            //时间表达式
-            ITrigger trigger = TriggerBuilder.Create().WithCronSchedule(CronExpressionString).Build();
-            IReadOnlyList<DateTimeOffset> dates = TriggerUtils.ComputeFireTimes(trigger as IOperableTrigger, null, numTimes);
-            List<DateTime> list = new List<DateTime>();
-            foreach (DateTimeOffset dtf in dates)
-            {
-                list.Add(TimeZoneInfo.ConvertTime(dtf.DateTime, TimeZoneInfo.Local));
-            }
-            return list;
         }
     }
 }
